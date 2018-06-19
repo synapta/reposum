@@ -3,7 +3,7 @@ from spacy import displacy
 import pandas as pd
 import spacy
 
-tesi_US = "./data/tesi_US/US_PhD_dissertations.xlsx"
+tesi_US = "../data/tesi_US/US_PhD_dissertations.xlsx"
 
 data = pd.read_excel(tesi_US, skiprows=9000, nrows=1000)
 
