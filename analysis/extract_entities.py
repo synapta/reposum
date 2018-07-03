@@ -1,5 +1,6 @@
+from nltk import word_tokenize, pos_tag, ne_chunk
 from spacy.pipeline import EntityRecognizer
-from spacy import displacy
+from rake_nltk import Rake
 import pandas as pd
 import spacy
 
@@ -9,6 +10,7 @@ data = pd.read_excel(tesi_US, skiprows=9000, nrows=1000)
 
 nlp = spacy.load('en_core_web_sm')
 ner = EntityRecognizer(nlp.vocab)
+rake = Rake(max_length=1)
 
 #row[2]: titolo
 #row[5]: lingua
@@ -35,8 +37,23 @@ for index,row in data.iterrows():
     doc = nlp(abstract)
     #processed = ner(doc)
     #input(processed)
-    print(abstract)
+    print(abstract, end="\n\n")
+    print("[spacy]\t",end="")
     for entity in doc.ents:
-        print("\t",entity.text, entity.label_)
-        input()
-    input()
+        print(entity.text, entity.label_, end="  -  ")
+
+    print("\n")
+
+    ner = ne_chunk(pos_tag(word_tokenize(abstract)), binary=True)
+    print("[nltk]\t",end="")
+    for part in ner:
+        if hasattr(part, "label"):
+            print(" ".join(ent[0] for ent in part), end="  -  ")
+
+    print("\n")
+
+    rake.extract_keywords_from_text(abstract)
+    kws = rake.get_ranked_phrases_with_scores()
+    print("[rake]\t",kws)
+
+    input("\n\n")

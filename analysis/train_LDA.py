@@ -1,10 +1,14 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
+from spacy.lang.en.lemmatizer.lookup import LOOKUP
+from spacy.lemmatizer import Lemmatizer
 from sklearn.externals import joblib
 import pandas as pd
 import numpy as np
 import sys
 import re
+
+n_top_words = 30
 
 if len(sys.argv) < 2:
     print("Usage:",sys.argv[0],"<number of topics or list of topics>")
@@ -29,6 +33,14 @@ def feed_data(input_data):
     for index,row in input_data.iterrows():
         yield row[' Abstract ']
 
+def print_top_words(model, feature_names, n_top_words):
+    for topic_idx, topic in enumerate(model.components_):
+        print()
+        message = "Topic #%d: " % int(topic_idx+1)
+        message += " ".join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]])
+        print(message)
+    print("\n\n")
+
 print("Reading data...")
 abstracts = pd.read_excel(fname, usecols=[24])
 
@@ -39,11 +51,13 @@ abstracts = abstracts[abstracts[' Abstract '] != "  Abstract not available. "]
 abstracts = abstracts[abstracts[' Abstract '] != "  Abstract Not Available "]
 abstracts = abstracts[abstracts[' Abstract '] != "Abstract not available."]
 
+input(abstracts.count()[0])
+
 cv = CountVectorizer(stop_words="english", analyzer="word")
 analyzer = cv.build_analyzer()
 
-abstracts = abstracts.applymap(lambda x:analyzer(x))
-abstracts = abstracts.applymap(lambda x: " ".join(s for s in x))
+#preprocessing
+abstracts = abstracts.applymap(lambda x: " ".join(s for s in analyzer(x)))
 
 for n_words in n_features:
     print("Selecting most frequent",n_words ,"words...")
@@ -65,3 +79,6 @@ for n_words in n_features:
 
         lda.fit(TDmatrix)
         joblib.dump(lda, "LDA_"+str(num)+"_"+str(n_words)[:-3]+"k.pkl")
+
+        tf_feature_names = cv.get_feature_names()
+        print_top_words(lda, tf_feature_names, n_top_words)
