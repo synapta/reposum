@@ -4,7 +4,7 @@ import lda, pickle, re, sys
 import pandas as pd
 import numpy as np
 
-num_topics = 10
+num_topics = 30
 n_top_words = 100
 n_words = 6000
 
