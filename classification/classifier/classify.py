@@ -9,8 +9,8 @@ def feed_data():
         if str(row['abs'])!="nan":
             yield row['argomento']+' '+row['titolo']+' '+row['abs']
 
-data = dsu.read_dataset_UK(False)
-data = data.iloc[:1000]
+data = dsu.read_dataset_UK(False).iloc[:5000]
+#data = data.iloc[:1000]
 print("Number of samples:",data.count()[0])
 
 vectorizer = joblib.load("vectorizer.pkl")
@@ -34,13 +34,15 @@ print("TDmatrix 1:",TDmatrix.shape)
 clf = joblib.load("randomforestCLF.pkl")
 
 res = clf.predict(TDmatrix)
+probs = clf.predict_proba(TDmatrix)
 acc_phil = np.mean(np.equal(res,1))
 acc_nphil = np.mean(np.equal(res,0))
 print("Philosophy:", acc_phil)
 print("No philosophy:", acc_nphil)
 
 for i in range(len(res)):
-    if res[i] == 0:
-        print(data_text.iloc[i]["titolo"])
-        print(data_text.iloc[i]["argomento"])
+    if probs[i][1] > 0.3:
+        print(probs[i])
+        print(data.iloc[i]["titolo"])
+        print(data.iloc[i]["argomento"])
         input()

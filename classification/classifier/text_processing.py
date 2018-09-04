@@ -25,6 +25,9 @@ def read_samples(phil_file, nphil_file):
 def remove_missing_abstract(df):
     return df[df['abstract'] != " dcterms_abstract:: @@MISSING-DATA"]
 
+def select_missing_abstract(df):
+    return df[df['abstract'] == " dcterms_abstract:: @@MISSING-DATA"]
+
 def build_vectorizer(name, min_df=0.0, max_df=1.0, n_features=20000):
     if name == "cv":
         return CountVectorizer(stop_words=set(list(nltk.corpus.stopwords.words('english'))+manual_stop_words),
@@ -36,18 +39,20 @@ def build_vectorizer(name, min_df=0.0, max_df=1.0, n_features=20000):
         return TfidfVectorizer(stop_words=set(list(nltk.corpus.stopwords.words('english'))+manual_stop_words),
                                 analyzer="word")
 
-def lemmatize_data(dataframe, col_name):
+def lemmatize_data(dataframe, col_name, output=True):
     wnl = WordNetLemmatizer()
     res = []
     count = 0
     for index,row in dataframe.iterrows():
-        print(count, end="\r")
+        if output:
+            print(count, end="\r")
         count += 1
         words = [wnl.lemmatize(i,j[0].lower()) if j[0].lower() in ['a','n','v'] else wnl.lemmatize(i) for i,j in pos_tag(word_tokenize(str(row[col_name])))]
         res.append(' '.join(w for w in words))
         if debug==True and count > 49:
             break
-    print("")
+    if output:
+        print("")
     return res
 
 def preprocess_dataframe(dataframe, processer):

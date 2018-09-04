@@ -7,6 +7,7 @@ from random import randint
 import pandas as pd
 import numpy as np
 import sys
+from sklearn.svm import SVC, LinearSVC
 
 use_preprocessed = True
 negative_ratio = 4
@@ -41,6 +42,7 @@ cv = tp.build_vectorizer("cv", min_df, max_df, n_features)
 analyzer = cv.build_analyzer()
 tfidf = tp.build_vectorizer("tfidf")
 vectorizer = tfidf
+#vectorizer = joblib.load("vectorizer.pkl")
 
 # preprocess text data
 if not use_preprocessed:
@@ -118,6 +120,27 @@ np.random.shuffle(s)
 train_data = np.array(train_data)[s]
 labels = np.array(labels)[s]
 
+# classificazione
+"""clf = RandomForestClassifier(max_depth=None,
+                                random_state=None,
+                                n_estimators=40,
+                                max_features=0.75,
+                                n_jobs=6,
+                                verbose=2)"""
+clf = LinearSVC(verbose=2)
+clf.fit(train_data[:-500],labels[:-500])
+#res1 = clf.predict(test_data_pos)
+#res2 = clf.predict(test_data_neg)
+#acc1 = np.mean(np.equal(res1,1))
+#acc2 = np.mean(np.equal(res2,0))
+#print("Pos accuracy:",acc1)
+#print("Neg accuracy:",acc2)
+res = clf.predict(train_data[-500:])
+acc = np.mean(np.equal(res,labels[-500:]))
+print("acc:",acc)
+
+joblib.dump(clf, "LinearSVC_CLF.pkl")
+
 """
 # distanza di vettori
 for i in range(TDmatrix1.shape[0]):
@@ -154,23 +177,3 @@ for i in range(TDmatrix2.shape[0]):
     print("Dist 2:",np.mean(np.array(dist2)))
     print("")
 """
-
-# classificazione
-clf = RandomForestClassifier(max_depth=None,
-                                random_state=None,
-                                n_estimators=40,
-                                max_features=0.75,
-                                n_jobs=6,
-                                verbose=2)
-clf.fit(train_data[:-500],labels[:-500])
-#res1 = clf.predict(test_data_pos)
-#res2 = clf.predict(test_data_neg)
-#acc1 = np.mean(np.equal(res1,1))
-#acc2 = np.mean(np.equal(res2,0))
-#print("Pos accuracy:",acc1)
-#print("Neg accuracy:",acc2)
-res = clf.predict(train_data[-500:])
-acc = np.mean(np.equal(res,labels[-500:]))
-print("acc:",acc)
-
-joblib.dump(clf, "randomforestCLF.pkl")
