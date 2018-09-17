@@ -1,2 +1,5 @@
-data/*
 ER/.ipynb_checkpoints/*
+data/*
+classification/classifier/data/*.csv
+*.pkl
+*.pyc

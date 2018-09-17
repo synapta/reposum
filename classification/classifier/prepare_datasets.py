@@ -54,5 +54,5 @@ def append_data(dictionary, row):
 scan_philosophy(dsu.read_dataset_UK(True))
 scan_philosophy(dsu.read_dataset_UK(False))
 
-pd.DataFrame(phils).to_csv("philosophy.csv", index=None)
-pd.DataFrame(no_phils).to_csv("no_philosophy.csv", index=None)
+pd.DataFrame(phils).to_csv("data/philosophy.csv", index=None)
+pd.DataFrame(no_phils).to_csv("data/no_philosophy.csv", index=None)

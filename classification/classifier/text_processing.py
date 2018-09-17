@@ -55,10 +55,11 @@ def lemmatize_data(dataframe, col_name, output=True):
         print("")
     return res
 
-def preprocess_dataframe(dataframe, processer):
+def preprocess_dataframe(dataframe, processer, check_length=True):
     dataframe = dataframe.applymap(lambda x: " ".join(s for s in processer(x)))
     dataframe = dataframe.applymap(lambda x: re.sub(r'[0-9]+',"",x))
-    dataframe = dataframe.applymap(lambda x: " ".join(s for s in x.split() if len(s) > 3))
+    if check_length:
+        dataframe = dataframe.applymap(lambda x: " ".join(s for s in x.split() if len(s) > 3))
     return dataframe
 
 def save_lemmatized_data(phil_df, nphil_df, phil_file, nphil_file):
