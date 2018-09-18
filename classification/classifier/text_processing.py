@@ -62,6 +62,11 @@ def preprocess_dataframe(dataframe, processer, check_length=True):
         dataframe = dataframe.applymap(lambda x: " ".join(s for s in x.split() if len(s) > 3))
     return dataframe
 
+def preprocess_subjects(df):
+    df = df.applymap(lambda x: x.lower())
+    df = df.applymap(lambda x: re.sub(r'[^\w\s\.]','',x))
+    return df
+
 def save_lemmatized_data(phil_df, nphil_df, phil_file, nphil_file):
     phil_df.to_csv(phil_file, index=False)
     nphil_df.to_csv(nphil_file, index=False)

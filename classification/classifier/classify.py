@@ -4,48 +4,79 @@ import dataset_utils as dsu
 import pandas as pd
 import numpy as np
 
-def feed_data():
-    for index,row in data_text.iterrows():
-        if str(row['abs'])!="nan":
+use_preprocessed = False
+
+def feed_preprocessed_data(dataframe):
+    for index,row in dataframe.iterrows():
+        yield row['preprocessed_data']
+
+def feed_data(dataframe, abs):
+    for index,row in dataframe.iterrows():
+        if abs:
             yield row['argomento']+' '+row['titolo']+' '+row['abs']
+        else:
+            yield row['argomento']+' '+row['titolo']
 
-#data = dsu.read_dataset_UK(False).iloc[:5000]
-#data = data.iloc[:1000]
-data1 = dsu.read_dataset_UK(False)
-data2 = dsu.read_dataset_UK(True)
-print("Number of samples:",data1.count()[0],data2.count()[0])
+def add_columns_to_df(df, clf_res, clf_probs):
+    prob0 = []
+    prob1 = []
+    for elem in clf_probs:
+        prob0.append(elem[0])
+        prob1.append(elem[1])
+    df.loc[:,"classification"] = clf_res
+    df.loc[:,"prob_0"] = prob0
+    df.loc[:,"prob_1"] = prob1
+    return df
 
-vectorizer = joblib.load("models/vectorizer_proc_titles.pkl")
+vectorizer = joblib.load("models/vectorizer_processSubjects.pkl")
 analyzer = vectorizer.build_analyzer()
+clf = joblib.load("models/randomforestCLF_processSubjects.pkl")
 
-for data in [data1, data2]:
+if use_preprocessed:
+    data_abs = pd.read_csv("data/UK_abs.csv")
+    data_no_abs = pd.read_csv("data/UK_no_abs.csv")
+    print("Number of samples:",data_abs.count()[0], data_no_abs.count()[0])
+
+    for data,label in zip([data_abs, data_no_abs],["abs", "no_abs"]):
+        TDmatrix = vectorizer.transform(feed_preprocessed_data(data))
+        res = clf.predict(TDmatrix)
+        probs = clf.predict_proba(TDmatrix)
+        res_df = add_columns_to_df(data, res, probs)
+        res_df.to_csv("results/classification_"+label+".csv",index=None)
+        print(label,"salvato")
+else:
+    #abstracts
+    data = dsu.read_dataset_UK(True).iloc[:200]
     data_subj = pd.DataFrame(tp.lemmatize_data(data[['argomento']],"argomento"), columns=['argomento'])
+    data_subj = tp.preprocess_subjects(data_subj)
     data_titles = pd.DataFrame(tp.lemmatize_data(data[['titolo']],"titolo"), columns=['titolo'])
     data_titles = tp.preprocess_dataframe(data_titles, analyzer)
     data_abs = pd.DataFrame(tp.lemmatize_data(data[['abs']],"abs"), columns=['abs'])
     data_abs = tp.preprocess_dataframe(data_abs, analyzer)
 
     data_text = data_subj.merge(data_titles,left_index=True,right_index=True).merge(data_abs,left_index=True,right_index=True)
+    print("samples:",data_text.count()[0])
 
-    print("data_text:",data_text.count())
-
-    # transform text data into vector space
-    TDmatrix = vectorizer.transform(feed_data())
-    print("Vocabulary:",len(vectorizer.vocabulary_))
-    print("TDmatrix:",TDmatrix.shape)
-
-    clf = joblib.load("models/randomforestCLF_proc_titles.pkl")
-
+    TDmatrix = vectorizer.transform(feed_data(data_text, True))
     res = clf.predict(TDmatrix)
     probs = clf.predict_proba(TDmatrix)
-    acc_phil = np.mean(np.equal(res,1))
-    acc_nphil = np.mean(np.equal(res,0))
-    print("Philosophy:", acc_phil)
-    print("No philosophy:", acc_nphil)
+    res_df = add_columns_to_df(data, res, probs)
+    res_df.to_csv("results/classification_abs.csv",index=None)
+    print("abs salvato")
 
-    """for i in range(len(res)):
-        if probs[i][1] > 0.3:
-            print(probs[i])
-            print(data.iloc[i]["titolo"])
-            print(data.iloc[i]["argomento"])
-            input()"""
+    #no abstracts
+    data_no_abs = dsu.read_dataset_UK(False).iloc[:200]
+    data_subj = pd.DataFrame(tp.lemmatize_data(data[['argomento']],"argomento"), columns=['argomento'])
+    data_subj = tp.preprocess_subjects(data_subj)
+    data_titles = pd.DataFrame(tp.lemmatize_data(data[['titolo']],"titolo"), columns=['titolo'])
+    data_titles = tp.preprocess_dataframe(data_titles, analyzer)
+
+    data_text = data_subj.merge(data_titles,left_index=True,right_index=True)
+    print("samples:",data_text.count()[0])
+
+    TDmatrix = vectorizer.transform(feed_data(data_text, False))
+    res = clf.predict(TDmatrix)
+    probs = clf.predict_proba(TDmatrix)
+    res_df = add_columns_to_df(data, res, probs)
+    res_df.to_csv("results/classification_no_abs.csv",index=None)
+    print("no abs salvato")
