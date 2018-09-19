@@ -6,7 +6,7 @@ import pandas as pd
 vectorizer = joblib.load("models/vectorizer.pkl")
 analyzer = vectorizer.build_analyzer()
 
-data = dsu.read_dataset_UK(True)
+data = dsu.read_dataset_UK_id(True)
 print("data 1 size:",data.count())
 data_subj = pd.DataFrame(tp.lemmatize_data(data[['argomento']],"argomento"), columns=['argomento'])
 data_subj = tp.preprocess_subjects(data_subj)
@@ -23,10 +23,10 @@ print("preprocessed size:",len(preprocessed_data))
 
 data.loc[:,"preprocessed_data"] = preprocessed_data
 
-data.to_csv("data/UK_abs.csv",index=None, columns=["titolo","autore","univ","publisher","anno","abs","tipo","argomento","preprocessed_data"])
+data.to_csv("data/UK_abs_id.csv",index=None, columns=["id","titolo","autore","univ","publisher","anno","abs","tipo","argomento","preprocessed_data"])
 
 
-data = dsu.read_dataset_UK(False)
+data = dsu.read_dataset_UK_id(False)
 print("data 2 size:",data.count())
 data.ix[data['abs']!='nan']
 data_subj = pd.DataFrame(tp.lemmatize_data(data[['argomento']],"argomento"), columns=['argomento'])
@@ -42,4 +42,4 @@ print("preprocessed size:",len(preprocessed_data))
 
 data.loc[:,"preprocessed_data"] = preprocessed_data
 
-data.to_csv("data/UK_no_abs.csv",index=None, columns=["titolo","autore","univ","publisher","anno","tipo","argomento","preprocessed_data"])
+data.to_csv("data/UK_no_abs_id.csv",index=None, columns=["id","titolo","autore","univ","publisher","anno","tipo","argomento","preprocessed_data"])

@@ -33,6 +33,8 @@ tesi_US = "../../data/tesi_US/US_PhD_dissertations.xlsx"
 tesi_UK_abs = "../../data/tesi_UK/tab_separated_value/171215/full_data/171215_1137_Synapta_EThOS_with_abstract.tsv"
 tesi_UK_abs_mod = "../../data/tesi_UK/tab_separated_value/171215/full_data/171215_1137_Synapta_EThOS_with_abstract_modified.csv"
 tesi_UK_nabs = "../../data/tesi_UK/tab_separated_value/171215/full_data/171215_1137_Synapta_EThOS_NO_abstract.tsv"
+tesi_UK_abs_id = "../../data/tesi_UK/tab_separated_value/171215/full_data/ABS_id.csv"
+tesi_UK_nabs_id = "../../data/tesi_UK/tab_separated_value/171215/full_data/NO_ABS_id.csv"
 
 def read_dataset_US():
     return pd.read_csv(tesi_US)
@@ -46,6 +48,12 @@ def read_dataset_UK(abs=True):
                             index_col=False,
                             header=0,
                             names=["titolo","autore","univ","publisher","anno","abs","tipo","argomento"])
+
+def read_dataset_UK_id(abs=True):
+    if abs:
+        return pd.read_csv(tesi_UK_abs_id)
+    else:
+        return pd.read_csv(tesi_UK_nabs_id)
 
 def search_philosophy_data(data):
     # https://en.wikipedia.org/wiki/Glossary_of_philosophy
@@ -77,3 +85,15 @@ def clean_dataset(path = tesi_UK_abs):
     new_df = pd.DataFrame(dic)
     print(new_df.count())
     new_df.to_csv("df.csv", index=None, columns=["titolo","autore","univ","publisher","anno","abs","tipo","argomento"])
+
+def add_identifier():
+    data_abs = read_dataset_UK(True)
+    data_no_abs = read_dataset_UK(False)
+    ids_abs = [i for i in range(1,data_abs.count()[0]+1)]
+    ids_no_abs = [i for i in range(data_abs.count()[0]+1,data_abs.count()[0]+data_no_abs.count()[0]+1)]
+    print(len(ids_abs),"-",ids_abs[0], ids_abs[-1])
+    print(len(ids_no_abs),"-",ids_no_abs[0], ids_no_abs[-1])
+    data_abs.loc[:,"id"] = ids_abs
+    data_no_abs.loc[:,"id"] = ids_no_abs
+    data_abs.to_csv("test1.csv", index=None)
+    data_no_abs.to_csv("test2.csv", index=None)

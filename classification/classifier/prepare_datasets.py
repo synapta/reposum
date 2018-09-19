@@ -9,7 +9,8 @@ phils = {"title":[],
             "year":[],
             "abstract":[],
             "type":[],
-            "subject":[]}
+            "subject":[],
+            "id":[]}
 no_phils = {"title":[],
             "creator":[],
             "university":[],
@@ -17,7 +18,8 @@ no_phils = {"title":[],
             "year":[],
             "abstract":[],
             "type":[],
-            "subject":[]}
+            "subject":[],
+            "id":[]}
 
 def scan_philosophy(data):
     for index,row in data.iterrows():
@@ -50,9 +52,10 @@ def append_data(dictionary, row):
     dictionary['abstract'].append(row['abs'])
     dictionary['type'].append(row['tipo'])
     dictionary['subject'].append(row['argomento'])
+    dictionary['id'].append(row['id'])
 
-scan_philosophy(dsu.read_dataset_UK(True))
-scan_philosophy(dsu.read_dataset_UK(False))
+scan_philosophy(dsu.read_dataset_UK_id(True))
+scan_philosophy(dsu.read_dataset_UK_id(False))
 
 pd.DataFrame(phils).to_csv("data/philosophy.csv", index=None)
 pd.DataFrame(no_phils).to_csv("data/no_philosophy.csv", index=None)

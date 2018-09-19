@@ -1,6 +1,7 @@
-ER/.ipynb_checkpoints/*
-data/*
 classification/classifier/data/*.csv
 classification/classifier/results/*
+ER/.ipynb_checkpoints/*
+data/*
 *.pkl
 *.pyc
+*.vec

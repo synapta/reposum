@@ -1,6 +1,4 @@
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.ensemble import RandomForestClassifier
-from scipy.spatial.distance import euclidean
 from sklearn.model_selection import KFold
 from sklearn.externals import joblib
 import text_processing as tp
@@ -10,6 +8,7 @@ import numpy as np
 import sys
 
 use_preprocessed = False
+cross_validation = False
 negative_ratio = 4
 min_df = 0.0
 max_df = 0.8
@@ -53,14 +52,14 @@ if not use_preprocessed:
     print("Negative samples:",negative_samples.count()[0])
 
     phil_subj = pd.DataFrame(tp.lemmatize_data(positive_samples[['subject']],"subject"), columns=['subject'])
-    phil_subj = tp.preprocess_dataframe(phil_subj, analyzer, False)
+    phil_subj = tp.preprocess_subjects(phil_subj)
     phil_titles = pd.DataFrame(tp.lemmatize_data(positive_samples[['title']],"title"), columns=['title'])
     phil_titles = tp.preprocess_dataframe(phil_titles, analyzer)
     phil_abs = pd.DataFrame(tp.lemmatize_data(positive_samples[['abstract']],"abstract"), columns=['abstract'])
     phil_abs = tp.preprocess_dataframe(phil_abs, analyzer)
 
     nphil_subj = pd.DataFrame(tp.lemmatize_data(negative_samples[['subject']],"subject"), columns=['subject'])
-    nphil_subj = tp.preprocess_dataframe(nphil_subj, analyzer, False)
+    nphil_subj = tp.preprocess_subjects(nphil_subj)
     nphil_titles = pd.DataFrame(tp.lemmatize_data(negative_samples[['title']],"title"), columns=['title'])
     nphil_titles = tp.preprocess_dataframe(nphil_titles, analyzer)
     nphil_abs = pd.DataFrame(tp.lemmatize_data(negative_samples[['abstract']],"abstract"), columns=['abstract'])
@@ -111,22 +110,23 @@ clf = RandomForestClassifier(max_depth=None,
                                 n_jobs=6,
                                 verbose=2)
 
-#10-fold cross-validation
-k_fold = KFold(n_splits=10)
-it = 1
-accuracies = []
-for train, test in k_fold.split(train_data):
-    print("cv iteration",it,"...")
-    clf.fit(train_data[train], labels[train])
-    res = clf.predict(train_data[test])
-    acc = np.mean(np.equal(res,labels[test]))
-    accuracies.append(acc)
+if cross_validation:
+    #10-fold cross-validation
+    k_fold = KFold(n_splits=10)
+    it = 1
+    accuracies = []
+    for train, test in k_fold.split(train_data):
+        print("cv iteration",it,"...")
+        clf.fit(train_data[train], labels[train])
+        res = clf.predict(train_data[test])
+        acc = np.mean(np.equal(res,labels[test]))
+        accuracies.append(acc)
 
-    print("accuracy at iteration",it,":",acc)
-    it += 1
+        print("accuracy at iteration",it,":",acc)
+        it += 1
 
-print("\ncross-validation accuracy:",np.mean(np.array(accuracies)))
+    print("\ncross-validation accuracy:",np.mean(np.array(accuracies)))
 
-#re-train model with all training data
+#train model with all training data
 clf.fit(train_data, labels)
 joblib.dump(clf, "models/randomforestCLF.pkl")

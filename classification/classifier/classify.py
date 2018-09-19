@@ -28,13 +28,13 @@ def add_columns_to_df(df, clf_res, clf_probs):
     df.loc[:,"prob_1"] = prob1
     return df
 
-vectorizer = joblib.load("models/vectorizer_processSubjects.pkl")
+vectorizer = joblib.load("models/vectorizer_cv.pkl")
 analyzer = vectorizer.build_analyzer()
-clf = joblib.load("models/randomforestCLF_processSubjects.pkl")
+clf = joblib.load("models/randomforestCLF_cv.pkl")
 
 if use_preprocessed:
-    data_abs = pd.read_csv("data/UK_abs.csv")
-    data_no_abs = pd.read_csv("data/UK_no_abs.csv")
+    data_abs = pd.read_csv("data/UK_abs_id.csv")
+    data_no_abs = pd.read_csv("data/UK_no_abs_id.csv")
     print("Number of samples:",data_abs.count()[0], data_no_abs.count()[0])
 
     for data,label in zip([data_abs, data_no_abs],["abs", "no_abs"]):
@@ -46,7 +46,7 @@ if use_preprocessed:
         print(label,"salvato")
 else:
     #abstracts
-    data = dsu.read_dataset_UK(True).iloc[:200]
+    data = dsu.read_dataset_UK_id(True)
     data_subj = pd.DataFrame(tp.lemmatize_data(data[['argomento']],"argomento"), columns=['argomento'])
     data_subj = tp.preprocess_subjects(data_subj)
     data_titles = pd.DataFrame(tp.lemmatize_data(data[['titolo']],"titolo"), columns=['titolo'])
@@ -65,7 +65,7 @@ else:
     print("abs salvato")
 
     #no abstracts
-    data_no_abs = dsu.read_dataset_UK(False).iloc[:200]
+    data_no_abs = dsu.read_dataset_UK_id(False)
     data_subj = pd.DataFrame(tp.lemmatize_data(data[['argomento']],"argomento"), columns=['argomento'])
     data_subj = tp.preprocess_subjects(data_subj)
     data_titles = pd.DataFrame(tp.lemmatize_data(data[['titolo']],"titolo"), columns=['titolo'])
