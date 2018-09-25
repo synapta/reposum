@@ -1,5 +1,6 @@
 classification/classifier/data/*.csv
 classification/classifier/results/*.csv
+classification/classifier/models/*
 ER/.ipynb_checkpoints/*
 data/*
 *.pkl

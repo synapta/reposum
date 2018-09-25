@@ -7,13 +7,15 @@ import pandas as pd
 import numpy as np
 import sys
 
+#train options
 use_preprocessed = False
 cross_validation = False
+test_ratio = 0.1
+#train data options
 negative_ratio = 4
 min_df = 0.0
 max_df = 0.8
 n_features = 60000
-test_ratio = 0.1
 
 def feed_data():
     for index,row in phil_text.iterrows():
@@ -121,11 +123,16 @@ if cross_validation:
         res = clf.predict(train_data[test])
         acc = np.mean(np.equal(res,labels[test]))
         accuracies.append(acc)
-
+        
         print("accuracy at iteration",it,":",acc)
         it += 1
-
     print("\ncross-validation accuracy:",np.mean(np.array(accuracies)))
+else:
+    test_split = int(round(len(train_data)*test_ratio))
+    clf.fit(train_data[:-test_split], labels[:-test_split])
+    res = clf.predict(train_data[-test_split:])
+    acc = np.mean(np.equal(res,labels[-test_split:]))
+    print("Accuracy:",acc)
 
 #train model with all training data
 clf.fit(train_data, labels)
