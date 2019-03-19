@@ -1,8 +1,13 @@
 classification/classifier/data/*.csv
 classification/classifier/results/*.csv
 classification/classifier/models/*
+tmf_entities/data/*
+tmf_entities/.vscode/*
+tmf_entities/pandas/*
 ER/.ipynb_checkpoints/*
 data/*
 *.pkl
 *.pyc
 *.vec
+*.pyc
+.vscode/*
