@@ -47,8 +47,8 @@ def lemmatize_data(data):
 
 cv = joblib.load("models/cv_{}.pkl".format(n_features))
 
+print("reading data...")
 if not use_preprocessed_data:
-    print("reading data...")
     df_id = pd.read_excel(
         "../data/tesi_US/US_PhD_dissertations.xlsx",
         usecols=[13,24],
@@ -76,9 +76,11 @@ else:
 
 ids = list(df_id['id'])
 for num in n_topics:
+    print("generating topics with model: lda_{}_{}".format(num, n_features))
     lda = joblib.load("models/lda_{}_{}.pkl".format(num, n_features))
     probs = lda.transform(cv.transform(df_id['preprocessed']))
 
+    print("saving topics...")
     with open("out/probs_{}_{}.csv".format(num, n_features), "w") as outfile:
         outfile.write("id,topic,prob\n")
         for id, t_probs in zip(ids, probs):

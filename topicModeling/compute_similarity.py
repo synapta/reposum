@@ -1,11 +1,11 @@
 import pandas as pd
 import os, pickle
 
-lda_file = ""
+lda_file = "out/probs_50_40000.csv"
 top_topics = 5
 
-n_topics = lda_file.split("_")[1]
-n_features = lda_file.split("_")[2].split(".")[0]
+n_topics = int(lda_file.split("_")[1])
+n_features = int(lda_file.split("_")[2].split(".")[0])
 
 df = pd.read_csv(lda_file)
 df = df.groupby("id", as_index=False).agg({
@@ -30,3 +30,6 @@ for index, row in df.iterrows():
         topic_info[topic][level].append(id)
 
 pickle.dump(topic_info, open("data/topic_info_{}_{}.pkl".format(n_topics, n_features), "wb"))
+
+#for topic,level_dict in topic_info.items():
+#    for level, ids in level_dict.items():
