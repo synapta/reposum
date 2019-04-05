@@ -54,7 +54,12 @@ tesi_UK_abs_ethos = "../data/tesi_UK/tab_separated_value/Synapta_EThOS.tsv"
 tesi_UK_nabs_ethos = "../data/tesi_UK/tab_separated_value/Synapta_EThOS_No_Abstract.tsv"
 
 def read_dataset_US(**kwargs):
-    return pd.read_excel(tesi_US, **kwargs)
+    return pd.read_excel(
+        tesi_US,
+        usecols=[2,5,9,11,13,14,17,20,21,22,23,24,25,26,27,28,29,30,31,32],
+        names=['titolo','lingua','autore','CIA','id','ISBN','fonte','keywords','pagine','dipartimento','data','abstract','url','tipo_doc','luogo','istituzione','num_pagine','subject','tipo_fonte','relatore'],
+        **kwargs
+    )
 
 def read_dataset_UK(abs=True):
     if abs:
@@ -74,16 +79,9 @@ def read_dataset_UK_id(abs=True):
 
 def read_dataset_UK_ethos(abs=True):
     if abs:
-        return pd.read_csv(tesi_UK_abs_ethos, delimiter="\t", skiprows=1, names=["id", "titolo","autore","univ","publisher","anno","abs","tipo","qname", "qlevel", "identifier", "source", "sxsi", "argomento", "unnamed"])
+        return pd.read_csv(tesi_UK_abs_ethos, delimiter="\t", skiprows=1, names=["id", "titolo","autore","univ","publisher","anno","abstract","tipo","qname", "qlevel", "identifier", "source", "sxsi", "argomento", "unnamed"])
     else:
         return pd.read_csv(tesi_UK_nabs_ethos, delimiter="\t", skiprows=1, names=["id","titolo","autore","univ","publisher","anno","tipo","qname", "qlevel", "identifier", "source", "sxsi", "argomento", "unnamed"])
-
-def search_philosophy_data(data):
-    # https://en.wikipedia.org/wiki/Glossary_of_philosophy
-    # https://en.wikipedia.org/wiki/List_of_philosophical_concepts
-    # http://users.ox.ac.uk/~worc0337/philosophers.html
-    for index,row in data.iterrows():
-        pass
 
 # pulisce il file al path tesi_UK_abs e toglie le righe senza abstract
 # il dataset risultante è quello a tesi_UK_abs_mod

@@ -21,7 +21,7 @@ for index,row in entities_df.iterrows():
 	for ent in title_worst_ents:
 		G.add_node(ent, type='entity')
 		G.add_edge(doc_id,ent, weight=1)
-	
+
 	if len(row['abstract_best']) != 0:
 		abs_best_ents = row['abstract_best'].split('\n')
 		abs_worst_ents = row['abstract_worst'].split('\n')
@@ -33,4 +33,4 @@ for index,row in entities_df.iterrows():
 			G.add_node(ent, type='entity')
 			G.add_edge(doc_id,ent, weight=1)
 
-nx.write_gpickle(G,'graph.pkl')
+nx.write_gpickle(G, 'graph.pkl')
