@@ -12,13 +12,14 @@ data/*
 *.pyc
 .vscode/*
 topicModeling/treetagger/*
+topicModeling/out/*
 nasari/*.txt
 nasari/*.zip
 classification/preprocessed_data/doiboost*
 classification/preprocessed_data/orcid*
 classification/preprocessed_data/splits/*
-data_gathering/doiboost_data/*
-data_gathering/orcid_data/*
+Data_gathering/doiboost_data/*
+Data_gathering/orcid_data/*
 classification/preprocessed_data/ethos_abs_preprocessed.csv
 classification/preprocessed_data/ethos_no_abs_preprocessed.csv
 classification/preprocessed_data/test_1000_preprocessed.csv

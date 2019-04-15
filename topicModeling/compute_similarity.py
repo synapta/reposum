@@ -1,35 +1,37 @@
 import pandas as pd
 import os, pickle
 
-lda_file = "out/probs_50_40000.csv"
-top_topics = 5
+top_topics = 3
 
-n_topics = int(lda_file.split("_")[1])
-n_features = int(lda_file.split("_")[2].split(".")[0])
+for file in os.listdir("out/"):
+    file_path = os.path.join("out/", file)
 
-df = pd.read_csv(lda_file)
-df = df.groupby("id", as_index=False).agg({
-    "topic": lambda x: list(x),
-    "prob": lambda x: list(x)
-})
+    n_topics = int(file.split("_")[1])
+    n_features = int(file.split("_")[2].split(".")[0])
 
-topic_info = {}
-for i in range(n_topics):
-    topic_info[i] = {
-        "high": [],
-        "med": [],
-        "low": []
-    }
+    df = pd.read_csv(file_path)
+    df = df.groupby("id", as_index=False).agg({
+        "topic": lambda x: list(x),
+        "prob": lambda x: list(x)
+    })
+    print("[{}] file read".format(file_path))
 
-for index, row in df.iterrows():
-    id = row['id']
-    topics = row['topic'][0:top_topics]
-    probs = row['prob'][0:top_topics]
+    topic_info = {}
+    for i in range(n_topics):
+        topic_info[i] = {
+            "high": [],
+            "med": [],
+            "low": []
+        }
 
-    for topic, prob, level in zip(topics, probs, ['high', 'med', 'low']):
-        topic_info[topic][level].append(id)
+    for index, row in df.iterrows():
+        id = row['id']
+        topics = row['topic'][0:top_topics]
+        probs = row['prob'][0:top_topics]
 
-pickle.dump(topic_info, open("data/topic_info_{}_{}.pkl".format(n_topics, n_features), "wb"))
+        for topic, prob, level in zip(topics, probs, ['high', 'med', 'low']):
+            topic_info[topic][level].append(id)
+    print("[{}] topics extracted".format(file_path))
 
-#for topic,level_dict in topic_info.items():
-#    for level, ids in level_dict.items():
+    pickle.dump(topic_info, open("data/topic_info_{}_{}_mod.pkl".format(n_topics, n_features), "wb"))
+    print("[{}] pickle saved\n".format(file_path))

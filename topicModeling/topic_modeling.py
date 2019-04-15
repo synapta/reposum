@@ -3,14 +3,14 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.externals import joblib
 from treetagger import TreeTagger
-import pandas as pd
 import pyLDAvis.sklearn
+import pandas as pd
 
 ################################################################################
 
 n_top_words = 30
-n_features = 40000
-n_topics = [20,30,40,50]
+n_features = 20000
+n_topics = [20, 30,40,50]
 use_preprocessed_data = True
 
 manual_stopwords = [
